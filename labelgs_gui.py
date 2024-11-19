@@ -212,7 +212,7 @@ class GaussianSplattingGUI:
                 now = datetime.datetime.now()
                 self.click_time = now.strftime("%d_%H%M%S")
                 self.click_multiview_num = 0
-                os.makedirs(f"./{self.save_folder}/{self.click_time}", exist_ok=True)
+                os.makedirs(f"{self.save_folder}/{self.click_time}", exist_ok=True)
 
 
         with dpg.handler_registry():
@@ -294,7 +294,7 @@ class GaussianSplattingGUI:
         img = scene_outputs["render"].permute(1, 2, 0)
 
         if self.new_click:
-            img_path = f"./{self.save_folder}/{self.click_time}/all_gua_render.png"
+            img_path = f"{self.save_folder}/{self.click_time}/all_gua_render.png"
             save_image(img, img_path)
 
         if self.clear_edit:
@@ -314,7 +314,7 @@ class GaussianSplattingGUI:
                 mask = self.point_to_mask(self.new_click_xy, img)
                 mask_save = mask.repeat(3, 1, 1).permute(1, 2, 0)
 
-                save_path = f"./{self.save_folder}/{self.click_time}/2d_mask.png"
+                save_path = f"{self.save_folder}/{self.click_time}/2d_mask.png"
                 save_image(mask_save, save_path)
 
                 alpha_id_map = scene_outputs["alpha_id_map"].cpu()
@@ -347,16 +347,16 @@ class GaussianSplattingGUI:
                 img = img * alpha + mask * (1 - alpha)
 
                 if self.new_click:
-                    save_path = f"./{self.save_folder}/{self.click_time}/3d_mask.png"
+                    save_path = f"{self.save_folder}/{self.click_time}/3d_mask.png"
                     save_image(mask, save_path)
 
                     save_img = scene_outputs["render"].permute(1, 2, 0)
-                    save_path = f"./{self.save_folder}/{self.click_time}/3D_seg.png"
+                    save_path = f"{self.save_folder}/{self.click_time}/3D_seg.png"
                     save_image(save_img, save_path)
 
         if self.new_click:
             save_img = img.clone()
-            img_path = f"./{self.save_folder}/{self.click_time}/display.png"
+            img_path = f"{self.save_folder}/{self.click_time}/display.png"
             xy = [int(self.new_click_xy[0]), int(self.new_click_xy[1])]
             save_img[xy[1]-5:xy[1]+5, xy[0]-5:xy[0]+5] = torch.tensor([1, 0, 0], device="cuda")
             save_image(save_img, img_path)
@@ -365,14 +365,18 @@ class GaussianSplattingGUI:
             self.save_gaussian_mask_func()
 
         if self.save_flag:
-            save_path = f"./{self.save_folder}/{self.click_time}/{dpg.get_value('save_name')}_{self.click_multiview_num}.png"
+            save_path = f"{self.save_folder}/{self.click_time}/{dpg.get_value('save_name')}_{self.click_multiview_num}.png"
             print("save:", save_path)
             save_image(img, save_path)
             self.click_multiview_num += 1
 
         if self.playing:
+            # os.makedirs(f"{self.save_folder}/playing", exist_ok=True)
             if self.frame_id < len(self.smooth_cameras) - 1:
                 self.frame_id += 1
+                # # frame_id to 5 digital
+                # img_path = f"{self.save_folder}/playing/{self.frame_id:05d}.png"
+                # save_image(img, img_path)
             else:
                 self.frame_id = 0
         if self.reset_playing:
@@ -403,7 +407,7 @@ class GaussianSplattingGUI:
         gau_mask = torch.zeros(gaussians.get_xyz.shape[0], dtype=torch.bool, device="cuda")
         for label in self.label_list:
             gau_mask = gau_mask | (gaussians.label == label)
-        mask_path = f"./{self.save_folder}/{dpg.get_value('gaussian_mask_name')}.npy"
+        mask_path = f"{self.save_folder}/{dpg.get_value('gaussian_mask_name')}.npy"
         torch.save(gau_mask, mask_path)
         print("Saved to ", mask_path)
 
@@ -432,10 +436,17 @@ def save_image(img, path):
     cv2.imwrite(path, img)
 
 def get_camera_pose(scene_path, image_height, image_width):
-    cameras_extrinsic_file = os.path.join(scene_path, "sparse/0", "images.bin")
-    cameras_intrinsic_file = os.path.join(scene_path, "sparse/0", "cameras.bin")
-    cam_extrinsics = read_extrinsics_binary(cameras_extrinsic_file)
-    cam_intrinsics = read_intrinsics_binary(cameras_intrinsic_file)
+
+    if os.path.exists(os.path.join(scene_path, "sparse/0", "images.bin")) and os.path.exists(os.path.join(path, "sparse/0", "cameras.bin")):
+        cameras_extrinsic_file = os.path.join(scene_path, "sparse/0", "images.bin")
+        cameras_intrinsic_file = os.path.join(scene_path, "sparse/0", "cameras.bin")
+        cam_extrinsics = read_extrinsics_binary(cameras_extrinsic_file)
+        cam_intrinsics = read_intrinsics_binary(cameras_intrinsic_file)
+    else:
+        cameras_extrinsic_file = os.path.join(scene_path, "sparse/0", "images.txt")
+        cameras_intrinsic_file = os.path.join(scene_path, "sparse/0", "cameras.txt")
+        cam_extrinsics = read_extrinsics_text(cameras_extrinsic_file)
+        cam_intrinsics = read_intrinsics_text(cameras_intrinsic_file)
 
     # cam_extrinsics sort by name
     cam_extrinsics = dict(sorted(cam_extrinsics.items(), key=lambda x: x[1].name))

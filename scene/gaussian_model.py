@@ -264,7 +264,13 @@ class GaussianModel:
         rots = np.zeros((xyz.shape[0], len(rot_names)))
         for idx, attr_name in enumerate(rot_names):
             rots[:, idx] = np.asarray(plydata.elements[0][attr_name])
-        label = np.asarray(plydata.elements[0]["label"])
+
+        if "label" in plydata.elements[0].properties:
+            label = np.asarray(plydata.elements[0]["label"])
+        else:
+            label = np.zeros((xyz.shape[0]), dtype=np.int32)
+
+        # label = np.asarray(plydata.elements[0]["label"])
 
         self._xyz = nn.Parameter(torch.tensor(xyz, dtype=torch.float, device="cuda").requires_grad_(True))
         #print(self._xyz.shape[0])

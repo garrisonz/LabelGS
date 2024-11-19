@@ -196,12 +196,12 @@ def get_seg_image_list(scene_path):
     return seg_image_list
 
 def readColmapSceneInfo(path, images, eval, mask_version, llffhold=8):
-    try:
+    if os.path.exists(os.path.join(path, "sparse/0", "images.bin")) and os.path.exists(os.path.join(path, "sparse/0", "cameras.bin")):
         cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.bin")
         cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.bin")
         cam_extrinsics = read_extrinsics_binary(cameras_extrinsic_file)
         cam_intrinsics = read_intrinsics_binary(cameras_intrinsic_file)
-    except:
+    else:
         cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.txt")
         cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.txt")
         cam_extrinsics = read_extrinsics_text(cameras_extrinsic_file)
@@ -217,6 +217,8 @@ def readColmapSceneInfo(path, images, eval, mask_version, llffhold=8):
             mask_folder = os.path.join(path, "mask/video_mask_auto")
     elif mask_version == 2:
         mask_folder = os.path.join(path, "mask/video_mask_auto")
+    elif mask_version == 4:
+        mask_folder = os.path.join(path, "mask/video_mask_auto.deva")
     else:
         mask_folder = os.path.join(path, "mask/mask_auto")
         print("[Warning] mask_version is not 2 or 3, use mask_auto folder")
@@ -228,18 +230,23 @@ def readColmapSceneInfo(path, images, eval, mask_version, llffhold=8):
     cam_infos = sorted(cam_infos_unsorted.copy(), key = lambda x : x.image_name)
 
     if eval:
-        #train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
-        #test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+        seg_path = os.path.join(path, "segmentations")
 
-        seg_list = get_seg_image_list(path)
-        seg_list = seg_list[1:]
-        test_cam_infos = []
-        train_cam_infos = []
-        for cam in cam_infos:
-            if cam.image_name in seg_list:
-                test_cam_infos.append(cam)
-            else:
-                train_cam_infos.append(cam)
+        if os.path.exists(seg_path):
+            seg_list = get_seg_image_list(path)
+            seg_list = seg_list[1:]
+            test_cam_infos = []
+            train_cam_infos = []
+            for cam in cam_infos:
+                if cam.image_name in seg_list:
+                    test_cam_infos.append(cam)
+                else:
+                    train_cam_infos.append(cam)
+        else:
+            train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
+            test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+
+
     else:
         train_cam_infos = cam_infos
         test_cam_infos = []

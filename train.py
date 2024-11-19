@@ -68,7 +68,7 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
     for iteration in range(first_iter, opt.iterations + 1):        
         if network_gui.conn == None:
             network_gui.try_connect()
-        while network_gui.conn != None:
+        while network_gui.conn != None and iteration % 20 == 0:
             try:
                 net_image_bytes = None
                 custom_cam, do_training, pipe.convert_SHs_python, pipe.compute_cov3D_python, keep_alive, scaling_modifer = network_gui.receive()
@@ -365,11 +365,11 @@ if __name__ == "__main__":
     parser.add_argument('--debug_from', type=int, default=-1)
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
     #parser.add_argument("--test_iterations", nargs="+", type=int, default=[7_000, 30_000])
-    parser.add_argument("--save_iterations", nargs="+", type=int, default=[7_000, 10000, 15000, 20000, 30_000, 40000, 50000, 60000])
+    parser.add_argument("--save_iterations", nargs="+", type=int, default=[5000, 7_000, 10000, 15000, 20000, 30_000, 40000, 50000, 60000])
     parser.add_argument("--test_iterations", nargs="+", type=int, default=None)
     parser.add_argument("--save_image_iterations", nargs="+", type=int, default=None)
     parser.add_argument("--quiet", action="store_true")
-    parser.add_argument("--checkpoint_iterations", nargs="+", type=int, default=[7000, 10000, 15000, 20000, 30000, 40000, 50000, 60000])
+    parser.add_argument("--checkpoint_iterations", nargs="+", type=int, default=[5000, 7000, 10000, 15000, 20000, 30000, 40000, 50000, 60000])
     parser.add_argument("--start_checkpoint", type=str, default=None)
     parser.add_argument("--label", action="store_true", default=False)
     parser.add_argument("--occlude_flag", action="store_true", default=False)
