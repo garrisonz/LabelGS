@@ -4,6 +4,10 @@ Yupeng Zhang, et al. 2024
 
 \| Webpage(TBA) \| Full Paper(TBA) \|
 
+<img width="700" align="center"  alt="pipeline4" src="https://github.com/user-attachments/assets/3cc10521-95d9-42fe-8141-47e3b69ae406" />
+
+This is the framework of LabelGS. We obtain cross-view masks from DEVA, occlusion relationship between masks by Occlusion Analysis Model, and lift these 2D pixel labels to 3D Gaussians by Main Gaussian Labeling and Gaussian Projection Filter.
+
 ----
 
 ## 1. Dataset
@@ -95,3 +99,4 @@ https://github.com/user-attachments/assets/b5ff5558-f3a1-4ae2-b8d7-4c611372f3a9
   ```
 
 ---
+
