@@ -1,8 +1,8 @@
 # LabelGS: Label-Aware 3D Gaussian Splatting for 3D Scene Segmentation
 
-Yupeng Zhang, et al. 2024
+Yupeng Zhang, Dezhi Zheng, Ping Lu, Han Zhang, Lei Wang, Liping xiang, Cheng Luo, Kaijun Deng, Xiaowen Fu, Linlin Shen, Jinbao Wang
 
-\| [Full Paper](https://arxiv.org/pdf/2508.19699) \|
+\| [Full Paper](https://arxiv.org/pdf/2508.19699) \| PRCV 2025 \|
 
 
 <img width="700" align="center"  alt="pipeline4" src="https://github.com/user-attachments/assets/3cc10521-95d9-42fe-8141-47e3b69ae406" />
@@ -99,6 +99,15 @@ https://github.com/user-attachments/assets/b5ff5558-f3a1-4ae2-b8d7-4c611372f3a9
   python eval/eval_all.py --dataset_name 3d_ovs
   ```
 
----
+## BibTeX
+
+```
+@inproceedings{zhang2025labelgs,
+    title={LabelGS: Label-Aware 3D Gaussian Splatting for 3D Scene Segmentation},
+    author={Yupeng Zhang, Dezhi Zheng, Ping Lu, Han Zhang, Lei Wang, Liping xiang, Cheng Luo, Kaijun Deng, Xiaowen Fu, Linlin Shen, Jinbao Wang},
+    journal={arXiv preprint arXiv:2508.19699},
+    year={2025}
+}
+```
 
 
