@@ -2,10 +2,10 @@ import os
 
 class CONFIG:
     r = 2 
-    window_width = int(1440/r)
+    window_width = int(810/r)
     window_height = int(1080/r)
 
-    width = int(1440/r)
+    width = int(810/r)
     height = int(1080/r)
 
     radius = 2

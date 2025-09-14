@@ -3,20 +3,15 @@
 import os
 import numpy as np
 from PIL import Image
-
-# get mask_root from command line
 import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("--mask_root", type=str, required=True) # example: /home/zhangyupeng/w/3drecon/LangSplat/dataset/3d_ovs/sofa/mask/mask_x/
-args = parser.parse_args()
-mask_root = args.mask_root
 
-global_ids = {}
 
 def rgb2instanceID(rgb):
     return np.dot(rgb[...,:3], [1, 256, 65536]).astype(np.uint32)
 
-def convert_mask():
+def convert_mask(mask_root):
+
+    global_ids = {}
     anno_dir = mask_root + "/Annotations"
     mask_files = os.listdir(anno_dir)
     #print("mask_files:", mask_files)
@@ -57,4 +52,22 @@ def convert_mask():
         
     print(os.path.join(mask_root, "global_ids.txt"), len(global_ids))
 
-convert_mask()
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset_path", type=str, required=True) # example "dataset/{dataset_name}"
+    parser.add_argument("--scene", type=str, default=None) # example 3d_ovs
+    args = parser.parse_args()
+    dataset_path = args.dataset_path
+    scene = args.scene
+
+    print(dataset_path)
+    scene_names = os.listdir(dataset_path)
+    if scene is not None:
+        scene_names = [scene]
+    scene_names.sort()
+    print("scene_names:", scene_names)
+
+    for scene_name in scene_names:
+        mask_root = f"{dataset_path}/{scene_name}/mask/video_mask_auto/"
+        convert_mask(mask_root)

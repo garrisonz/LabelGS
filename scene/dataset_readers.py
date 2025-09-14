@@ -68,7 +68,7 @@ def getNerfppNorm(cam_info):
 
     return {"translate": translate, "radius": radius}
 
-def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder, mask_folder):
+def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder, mask_folder, occlude_flag):
 
     # read rendering_gt_mapping from rendering_gt_mappint.json
     rendering_gt_mapping = {}
@@ -77,7 +77,7 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder, mask_folder
     if os.path.exists(rendering_gt_mapping_file):
         with open(rendering_gt_mapping_file, 'r') as f:
             rendering_gt_mapping = json.load(f)
-        print("rendering_gt_mapping:", rendering_gt_mapping)
+        # print("rendering_gt_mapping:", rendering_gt_mapping)
     
     print("cam_extrinsics num:", len(cam_extrinsics))
 
@@ -122,7 +122,7 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder, mask_folder
         image_name = os.path.basename(image_path).split(".")[0]
 
         # replace JPG with jpg to avoid issues with file extensions
-        if "3d_ovs" in images_folder.split("/")[-3] and image_path.endswith(".JPG"):
+        if image_path.endswith(".JPG"):
             image_path = image_path.replace(".JPG", ".jpg")
         
         image = Image.open(image_path)
@@ -146,12 +146,13 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder, mask_folder
             #    print("[Warning] mask_file not exists:", mask_file)
 
         occlude_mapping = {}
-        occlude_mapping_file = f"{mask_folder}/occlude/occlude_mapping_{image_name}.json"
-        if os.path.exists(occlude_mapping_file):
-            with open(occlude_mapping_file, 'r') as f:
-                occlude_mapping = json.load(f, object_hook=lambda d: {int(k) if k.lstrip('-').isdigit() else k: v for k, v in d.items()})
-        #else:
-        #    print("[Warning]occlude_mapping_file not exists:", occlude_mapping_file)
+        if occlude_flag:
+            occlude_mapping_file = f"{mask_folder}/occlude/occlude_mapping_{image_name}.json"
+            if os.path.exists(occlude_mapping_file):
+                with open(occlude_mapping_file, 'r') as f:
+                    occlude_mapping = json.load(f, object_hook=lambda d: {int(k) if k.lstrip('-').isdigit() else k: v for k, v in d.items()})
+            else:
+                print("[Warning]occlude_mapping_file not exists:", occlude_mapping_file)
      
         cam_info = CameraInfo(uid=uid, R=R, T=T, FovY=FovY, FovX=FovX, image=image, image_path=image_path, image_name=image_name, 
                               mask_list=mask_list, sdf_list=sdf_list, occlude_mapping=occlude_mapping, width=width, height=height)
@@ -195,7 +196,7 @@ def get_seg_image_list(scene_path):
     seg_image_list.sort()
     return seg_image_list
 
-def readColmapSceneInfo(path, images, eval, mask_version, llffhold=8):
+def readColmapSceneInfo(path, images, eval, version, mask_version, occlude_flag, llffhold=8):
     if os.path.exists(os.path.join(path, "sparse/0", "images.bin")) and os.path.exists(os.path.join(path, "sparse/0", "cameras.bin")):
         cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.bin")
         cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.bin")
@@ -207,46 +208,40 @@ def readColmapSceneInfo(path, images, eval, mask_version, llffhold=8):
         cam_extrinsics = read_extrinsics_text(cameras_extrinsic_file)
         cam_intrinsics = read_intrinsics_text(cameras_intrinsic_file)
 
-
-    scene_name = path.split("/")[-1]
-    if mask_version == 3:
-        if scene_name in ["sofa", "table"]:
-            # deva cannot segment statues in sofa and table scene, so use video_mask_auto2 which segment twice.
-            mask_folder = os.path.join(path, "mask/video_mask_auto2")
-        else:
-            mask_folder = os.path.join(path, "mask/video_mask_auto")
-    elif mask_version == 2:
-        mask_folder = os.path.join(path, "mask/video_mask_auto")
-    elif mask_version == 4:
-        mask_folder = os.path.join(path, "mask/video_mask_auto.deva")
-    else:
-        mask_folder = os.path.join(path, "mask/mask_auto")
-        print("[Warning] mask_version is not 2 or 3, use mask_auto folder")
-
-    print(scene_name, "mask_version:", mask_version, mask_folder)
+    from utils.reader_utils import get_mask_folder
+    mask_folder = os.path.join(path, get_mask_folder(mask_version))
+    print("mask_version:", mask_version, mask_folder)
 
     reading_dir = "images" if images == None else images
-    cam_infos_unsorted = readColmapCameras(cam_extrinsics=cam_extrinsics, cam_intrinsics=cam_intrinsics, images_folder=os.path.join(path, reading_dir), mask_folder=mask_folder)
+    cam_infos_unsorted = readColmapCameras(cam_extrinsics=cam_extrinsics, cam_intrinsics=cam_intrinsics, images_folder=os.path.join(path, reading_dir), mask_folder=mask_folder, occlude_flag=occlude_flag)
     cam_infos = sorted(cam_infos_unsorted.copy(), key = lambda x : x.image_name)
 
     if eval:
-        seg_path = os.path.join(path, "segmentations")
-
-        if os.path.exists(seg_path):
-            seg_list = get_seg_image_list(path)
-            seg_list = seg_list[1:]
-            test_cam_infos = []
-            train_cam_infos = []
-            for cam in cam_infos:
-                if cam.image_name in seg_list:
-                    test_cam_infos.append(cam)
-                else:
-                    train_cam_infos.append(cam)
+        if version.startswith("5.1"):
+            print("Using version 5 evaluation")
+            img_list_path = os.path.join(path, "test_images.txt")
+            with open(img_list_path, 'r') as f:
+                img_list = f.readlines()
+                img_list = [img.strip().split(".")[0] for img in img_list]
+            test_cam_infos = [c for c in cam_infos if c.image_name in img_list]
+            train_cam_infos = [c for c in cam_infos if c.image_name not in img_list]
         else:
-            train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
-            test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+            print("Using non-5 version evaluation")
+            seg_path = os.path.join(path, "segmentations")
 
-
+            if os.path.exists(seg_path):
+                seg_list = get_seg_image_list(path)
+                seg_list = seg_list[1:]
+                test_cam_infos = []
+                train_cam_infos = []
+                for cam in cam_infos:
+                    if cam.image_name in seg_list:
+                        test_cam_infos.append(cam)
+                    else:
+                        train_cam_infos.append(cam)
+            else:
+                train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
+                test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
     else:
         train_cam_infos = cam_infos
         test_cam_infos = []

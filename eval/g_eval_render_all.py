@@ -1,11 +1,12 @@
 import os
-import yaml
 import argparse
+import yaml
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset_name", type=str, required=True) # example 3d_ovs
 parser.add_argument("--scene", type=str, default=None)
-parser.add_argument("--white_background", action="store_true", default=False)
 parser.add_argument("--config_file", type=str, required=True)
+parser.add_argument("--white_background", action="store_true", default=False)
 parser.add_argument("--exclude_scenes", type=str, default="", help="support multi scene, e.g. room,sofa") # example 3d_ovs
 args = parser.parse_args()
 dataset_name = args.dataset_name
@@ -27,6 +28,7 @@ if scene is not None:
 scene_names.sort()
 print("scene_names:", scene_names)
 
+
 with open(args.config_file, 'r') as f:
     config = yaml.safe_load(f)
     iteration = config['iteration']
@@ -42,14 +44,13 @@ if white_background:
 else:
     white_background = ""
 
-
 for scene_name in scene_names:
 
     loaded_iter = 15000
     if scene_name == "garden":
         loaded_iter = 10000
 
-    cmd = (f"python -m eval.eval_psnr_iou -m output/{dataset_name}/w{work}_{scene_name}_v{version} "
+    cmd = (f"python -m eval.eval_render -m output/{dataset_name}/w{work}_{scene_name}_v{version} "
            f"--loaded_iter {loaded_iter} {white_background} "
            f"--dataset_name {dataset_name} "
            f"--scene_name {scene_name} "

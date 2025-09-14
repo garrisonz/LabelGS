@@ -4,9 +4,11 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset_name", type=str, required=True) # example 3d_ovs
 parser.add_argument("--eval", action="store_true")
+parser.add_argument("--scene", type=str, default=None) # example 3d_ovs
 args = parser.parse_args()
 dataset_name = args.dataset_name
 eval = args.eval
+scene = args.scene
 
 dataset_path = f"/home/zhangyupeng/w/3drecon/LabelGS/dataset/{dataset_name}"
 print(dataset_path)
@@ -31,7 +33,8 @@ iteration = 30000
 
 for scene_name in scene_names:
 
-    #scene_name = "garden"
+    if scene is not None:
+        scene_name = scene
 
 
     #start_iteration = 15000
@@ -40,4 +43,6 @@ for scene_name in scene_names:
     cmd = (f"python train.py -s dataset/{dataset_name}/{scene_name} -m output/{dataset_name}/{scene_name} {eval_cmd} --iteration {iteration} {start_cmd}")
     print(cmd)
     os.system(cmd)
-#    exit()
+
+    if scene is not None:
+        break

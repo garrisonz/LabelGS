@@ -29,8 +29,15 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor,
         label_id = torch.tensor([-1], device="cuda", dtype=torch.int32)
 
     # add -1 to the end of label_id if it is not there
-    if len(label_id)== 0 or label_id[-1] != -1:
+    if len(label_id)== 0:
         label_id = torch.cat((label_id, torch.tensor([-1], device="cuda", dtype=torch.int32)))
+
+    if torch.isin(label_id, -1).sum() > 0:
+        # ensure -1 is the last element
+        label_id = torch.cat((label_id[label_id != -1], torch.tensor([-1], device="cuda", dtype=torch.int32)))
+    else:
+        label_id = torch.cat((label_id, torch.tensor([-1], device="cuda", dtype=torch.int32)))
+
  
     # Create zero tensor. We will use it to make pytorch return gradients of the 2D (screen-space) means
     screenspace_points = torch.zeros_like(pc.get_xyz, dtype=pc.get_xyz.dtype, requires_grad=True, device="cuda") + 0

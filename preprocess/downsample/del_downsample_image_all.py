@@ -15,6 +15,10 @@ scene_names = os.listdir(dataset_path)
 
 # remove file in scnen_names
 scene_names = [scene_name for scene_name in scene_names if os.path.isdir(f"{dataset_path}/{scene_name}")]
+
+if dataset_name == "360_v2":
+    scene_names = [scene_name for scene_name in scene_names if os.path.isdir(f"{dataset_path}/{scene_name}/segmentations")]
+
 print("scene_names:", scene_names)
 
 #scene_names = ['bench', 'bed', 'snacks', 'table', 'lawn', 'blue_sofa', 'covered_desk', 'office_desk']
@@ -28,5 +32,9 @@ for scene_name in scene_names:
     scene_path = f"{dataset_path}/{scene_name}"
     print("downscale: ", scene_path)
 
-    os.system(f"python preprocess/downsample/downsample_image2.py --scene_path {scene_path} --max_height {max_height}") 
+    cmd = (f"python preprocess/downsample/downsample_image2.py "
+              f"--scene_path {scene_path} --max_height {max_height}") 
+
+    print(cmd)
+    os.system(cmd)
     #exit()

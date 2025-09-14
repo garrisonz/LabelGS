@@ -51,7 +51,7 @@ def lift_label(gaussian_labels, alpha_max_map, orig_alpha_id_map, mask_map, proj
         valid_gid = visible_gid[indicate]
     else:
         valid_gid = visible_gid
-        print("[Warning]not use GPF", gpf_flag)
+        #print("[Warning]not use GPF", gpf_flag)
     # end. Gaussian Projection Filter
 
     update_gid = alpha_ids[torch.isin(alpha_ids, valid_gid)].type(torch.long)

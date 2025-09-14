@@ -2,18 +2,8 @@ import os
 import cv2
 import numpy as np
 
-# get scene_path from command line
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('--scene_path', type=str, required=True) # "dataset/3d_ovs/sofa"
-parser.add_argument('--max_height', type=int, default=1080) # "dataset/3d_ovs/sofa"
 
-args = parser.parse_args()
-scene_path = args.scene_path
-max_height = args.max_height
-print("scene_path:", scene_path)
-
-def downsample_image(source_folder, output_folder, is_mask=False):
+def downsample_image(source_folder, output_folder, max_height, is_mask=False):
     img_dir = source_folder
     output_folder = output_folder
     os.makedirs(output_folder, exist_ok=True)
@@ -39,6 +29,7 @@ def downsample_image(source_folder, output_folder, is_mask=False):
         resolution = (int( orig_w  / scale), int(orig_h / scale))
         image = cv2.resize(image, resolution)
         img = image
+        img = img.astype(np.uint8)
 
         if is_mask:
             img = img > 128
@@ -48,10 +39,30 @@ def downsample_image(source_folder, output_folder, is_mask=False):
         print(f"downsampled {img_name} to {output_folder} {img.shape}")
 
 
-origin_path = scene_path + "/images"
-bak_path = scene_path + "/images_input"
-if not os.path.exists(bak_path):
-    os.system(f"mv {origin_path} {bak_path}")
-    print(f"mv {origin_path} {bak_path}")
+def downsample_scene(scene_path, max_height=1080):
+    images_path = scene_path + "/images"
+    input_path = scene_path + "/images_input"
+    if not os.path.exists(input_path):
+        os.rename(images_path, input_path)
 
-downsample_image(scene_path + "/images_input", scene_path + "/images")
+    downsample_image(input_path, images_path, max_height, is_mask=False)
+
+if __name__ == "__main__":
+
+    import argparse
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--dataset_path', type=str, required=True) # "dataset/{dataset_name}"
+    parser.add_argument("--max_height", type=int, default=1080)
+    args = parser.parse_args()
+    dataset_path = args.dataset_path
+    max_height = args.max_height
+
+    scene_names = os.listdir(dataset_path)
+    scene_names.sort()
+
+    print("scene_names:", scene_names)
+
+    for scene_name in scene_names:
+        scene_path = f"{dataset_path}/{scene_name}"
+        downsample_scene(scene_path, max_height)

@@ -3,8 +3,10 @@ import os
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset_name", type=str, required=True) # example 3d_ovs
+parser.add_argument("--scene", type=str, default=None) # example 3d_ovs
 args = parser.parse_args()
 dataset_name = args.dataset_name
+scene = args.scene
 
 dataset_path = f"/home/zhangyupeng/w/3drecon/LabelGS/dataset/{dataset_name}"
 print(dataset_path)
@@ -21,9 +23,12 @@ loaded_iter = 30000
 
 for scene_name in scene_names:
 
-    #scene_name = "garden"
+    if scene is not None:
+        scene_name = scene
 
     cmd = f"python -m preprocess.densify_views.render_video -m output/{dataset_name}/{scene_name} --loaded_iter {loaded_iter}"
     print(cmd)
     os.system(cmd)
-    #exit()
+    
+    if scene is not None:
+        break

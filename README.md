@@ -8,7 +8,7 @@ Yupeng Zhang, et al. 2024
 
 ## 1. Dataset
 
-- We provide `segmentations` folder for nerf_llff_data dataset and `segmentations_v2` for 3d_ovs dataset, to evaluate the performance of 3D Object segmentation by extracting 3D representation primitive
+- We provide `segmentations` folder for nerf_llff_data dataset and 3d_ovs dataset, to evaluate the performance of 3D Object segmentation by extracting 3D representation primitive
 
 ## 2. Data Preprocess
 

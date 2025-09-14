@@ -34,15 +34,14 @@ except ImportError:
 TENSORBOARD_FOUND = False
     
 
-def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoint_iterations, checkpoint, debug_from, occlude_flag, mask_version, gpf_flag, start_label_iter, args):
-    print("occlude_flag: ", occlude_flag)
+def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoint_iterations, checkpoint, debug_from, occlude_flag, version, mask_version, gpf_flag, start_label_iter, args):
 
     output_dir = dataset.model_path
     
     first_iter = 0
     tb_writer = prepare_output_and_logger(dataset)
     gaussians = GaussianModel(dataset.sh_degree)
-    scene = Scene(dataset, gaussians, mask_version=mask_version)
+    scene = Scene(dataset, gaussians, version=version, mask_version=mask_version, occlude_flag=occlude_flag)
     gaussians.training_setup(opt)
 
     if checkpoint:
@@ -135,7 +134,7 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             uni_mask_map = viewpoint_cam.mask_list[0]
             mask_ids = torch.unique(uni_mask_map)
 
-            train_path = output_dir + "/train"
+            train_path = output_dir.replace("output", "result", 1) + "/train"
             os.makedirs(train_path, exist_ok=True)
             image_name = viewpoint_cam.image_name
 
@@ -144,19 +143,12 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             # if iteration % save_debug_interval == 0:
             #     save_image = image.clone().type(torch.float32)
             #     torchvision.utils.save_image(save_image,  train_path+f"/{iteration}_{image_name}_image.png")
-            
             #     label_map = gaussians.label[alpha_id_map.type(torch.long)]
             #     save_label_map = label_map.clone().type(torch.float32) / label_map.max()
             #     torchvision.utils.save_image(save_label_map,  train_path+f"/{iteration}_{image_name}_label_map_before.png")
-
-            #     save_uni_mask_map = uni_mask_map.clone().type(torch.float32) / uni_mask_map.max()
-            #     torchvision.utils.save_image(save_uni_mask_map,  train_path+f"/{iteration}_{image_name}_uni_mask_map.png")
             # # end save
 
             sample_mask_ids = mask_ids[torch.randperm(mask_ids.shape[0])][:args.mask_sample_number]
-
-            # sort for debug
-            # sample_mask_ids = torch.sort(sample_mask_ids)[0]
 
             for i, mask_id in enumerate(sample_mask_ids):
                 if mask_id == 0:
@@ -207,7 +199,6 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
                 #label_image_unocc = label_image * unocclude_map
                 #torchvision.utils.save_image(label_image_unocc,  train_path+f"/{iteration}_{image_name}_label_{label_id.item()}_image_unocc.png")
-
                 #torchvision.utils.save_image(label_image,  train_path+f"/{iteration}_{image_name}_label_{label_id.item()}_image.png")
 
                 label_loss += l1_loss(label_image * unocclude_map, label_gt * unocclude_map)
@@ -217,11 +208,7 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             #     label_map = gaussians.label[alpha_id_map.type(torch.long)]
             #     save_label_map = label_map.clone().type(torch.float32) / label_map.max()
             #     torchvision.utils.save_image(save_label_map,  train_path+f"/{iteration}_{image_name}_label_map_after.png")
-
             # end save
-
-            # if iteration % 10 == 0:
-            #     exit()
 
         gt_image = viewpoint_cam.original_image.cuda()
         Ll1 = l1_loss(image, gt_image)
@@ -289,6 +276,12 @@ def prepare_output_and_logger(args):
     else:
         print("Tensorboard not available: not logging progress")
     return tb_writer
+
+def save_cfg_args(args, model_path):
+    os.makedirs(model_path, exist_ok = True)
+    with open(os.path.join(model_path, "our_cfg_args"), 'w') as cfg_log_f:
+        cfg_log_f.write(str(Namespace(**vars(args))))
+
 
 def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_iterations, scene : Scene, renderFunc, renderArgs):
     if tb_writer:
@@ -360,7 +353,7 @@ if __name__ == "__main__":
     lp = ModelParams(parser)
     op = OptimizationParams(parser)
     pp = PipelineParams(parser)
-    parser.add_argument('--ip', type=str, default="127.0.0.1")
+    parser.add_argument('--ip', type=str, default="127.0.0.3")
     parser.add_argument('--port', type=int, default=55555)
     parser.add_argument('--debug_from', type=int, default=-1)
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
@@ -374,12 +367,15 @@ if __name__ == "__main__":
     parser.add_argument("--label", action="store_true", default=False)
     parser.add_argument("--occlude_flag", action="store_true", default=False)
     parser.add_argument("--gpf_flag", action="store_true", default=False)
+    parser.add_argument("--version", type=str, default="5.0")
     parser.add_argument("--mask_version", type=int, default=3)
     parser.add_argument('--start_label_iter', type=int, default=1000)
     parser.add_argument('--alpha_max_threshold', type=float, default=0.6)
     parser.add_argument('--mask_sample_number', type=int, default=10)
     args = parser.parse_args(sys.argv[1:])
     args.save_iterations.append(args.iterations)
+
+    save_cfg_args(args, args.model_path)
 
     if args.test_iterations is None:
         args.test_iterations = create_test_iterations()
@@ -390,11 +386,10 @@ if __name__ == "__main__":
     if args.save_iterations is None:
         args.save_iterations = create_test_iterations()
 
-#    args.checkpoint_iterations = create_checkpoint_iterations()
-
-
-    if args.gpf_flag == False:
-        print("[Warning]not use GPF")
+    print("version:", args.version)
+    print("mask_version:", args.mask_version)
+    print("gpf_flg:", args.gpf_flag)
+    print("occude_flag:", args.occlude_flag)
 
     print("alpha_max_threshold:", args.alpha_max_threshold)
     print("mask_sample_number:", args.mask_sample_number)
@@ -405,7 +400,7 @@ if __name__ == "__main__":
     # Start GUI server, configure and run training
     network_gui.init(args.ip, args.port)
     torch.autograd.set_detect_anomaly(args.detect_anomaly)
-    training(lp.extract(args), op.extract(args), pp.extract(args), args.test_iterations, args.save_iterations, args.checkpoint_iterations, args.start_checkpoint, args.debug_from, args.occlude_flag, args.mask_version, args.gpf_flag, args.start_label_iter, args)
+    training(lp.extract(args), op.extract(args), pp.extract(args), args.test_iterations, args.save_iterations, args.checkpoint_iterations, args.start_checkpoint, args.debug_from, args.occlude_flag, args.version, args.mask_version, args.gpf_flag, args.start_label_iter, args)
 
     # All done
     print("\nTraining complete.")

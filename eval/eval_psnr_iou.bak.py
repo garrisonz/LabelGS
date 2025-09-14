@@ -81,11 +81,12 @@ def eval(dataset : ModelParams, pipeline : PipelineParams, args):
         label_map = gaussians.label[alpha_id_map].cpu().numpy()
         label_map_cnt = np.unique(label_map, return_counts=True)
         label_map_cnt = dict(zip(label_map_cnt[0], label_map_cnt[1]))
-        #print("label_map_cnt:", label_map_cnt)
+        print("label_map_cnt:", label_map_cnt)
 
         # get the 3d object in gaussian model for each prompt mask
         object_to_label = {}
         for label_str, mask in prompt_annos.items():
+            print("label_str:", label_str)
             mask_label_cnt = np.unique(label_map * mask, return_counts=True)
             mask_label_cnt = dict(zip(mask_label_cnt[0], mask_label_cnt[1]))
             mask_label_cnt.pop(0, None)
@@ -96,9 +97,14 @@ def eval(dataset : ModelParams, pipeline : PipelineParams, args):
         print("object_to_label: ", object_to_label)
 
         # evaluate on eval_set
+        print("eval in eval_set...")
         test_cameras = scene.getTestCameras()
         test_cameras = {c.image_name: c for c in test_cameras}
-        for frame_num, eval_anno in tqdm(eval_set.items()):
+        object_psnr = {}
+        object_psnr_num = {}
+        iou_list = []
+        for frame_num, eval_anno in eval_set.items():
+            print("frame_num:", frame_num)
             if frame_num not in test_cameras:
                 print(f"frame_num {frame_num} not in test_cameras")
                 continue
@@ -121,9 +127,11 @@ def eval(dataset : ModelParams, pipeline : PipelineParams, args):
                 label_ids = torch.tensor(label_ids, dtype=torch.int32, device="cuda")
                 render_pkg = render(view, gaussians, pipeline, background, args, label_id=label_ids)
                 torchvision.utils.save_image(render_pkg["render"],  eval_path+f"/test{frame_num}_{label_str}.png")
+                print("save:", eval_path+f"/test{frame_num}_{label_str}.png")
 
                 gt = test_cameras[frame_num].original_image * seg.type(torch.bool)
                 torchvision.utils.save_image(gt,  eval_path+f"/test{frame_num}_{label_str}_gt.png")
+                print("save:", eval_path+f"/test{frame_num}_{label_str}_gt.png")
 
                 # start. croped gt and rendering for psnr calculation
                 os.makedirs(eval_path+f"/croped", exist_ok=True)
@@ -146,19 +154,38 @@ def eval(dataset : ModelParams, pipeline : PipelineParams, args):
 
                 # caluate iou
                 mask_pred = render_pkg["render"] > 0.01
+                # mask_pred is [3, 1080, 1440], convert to [1090, 1440], set each element to 1 if any of channel is 1
                 mask_pred = mask_pred.any(dim=0)
+
                 mask_pred = mask_pred.type(torch.float32)
                 torchvision.utils.save_image(mask_pred,  eval_path+f"/test{frame_num}_{label_str}_mask_pred.png")
+
                 mask_pred = np.array(mask_pred.cpu())
                 mask_gt = np.array(seg.cpu())
                 intersection = np.sum(np.logical_and(mask_gt, mask_pred))
                 union = np.sum(np.logical_or(mask_gt, mask_pred))
                 iou = (np.sum(intersection) / np.sum(union))
+                iou_list.append(iou)
 
                 metrics["obj_iou"].append(iou)
                 metrics["obj_psnr"].append(psnr1.item())
                 metrics["obj_ssim"].append(ssim_value)
                 metrics["obj_lpips"].append(lpips_value)    
+
+
+                if label_str not in object_psnr:
+                    object_psnr[label_str] = 0
+                    object_psnr_num[label_str] = 0
+                object_psnr[label_str] += psnr1.item()
+                object_psnr_num[label_str] += 1
+
+            
+        for label_str in object_psnr:
+            object_psnr[label_str] /= object_psnr_num[label_str]
+        # sort object_psnr according key
+        object_psnr = dict(sorted(object_psnr.items(), key=lambda x: x[0]))
+
+        print("object_psnr: ", object_psnr)
 
         save_metrics(f"{eval_path}/metrics.csv", metrics, scene_name)
 
