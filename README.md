@@ -1,8 +1,15 @@
 # LabelGS: Label-Aware 3D Gaussian Splatting for 3D Scene Segmentation
 
-Yupeng Zhang, et al. 2024
+Yupeng Zhang, Dezhi Zheng, Ping Lu, Han Zhang, Lei Wang, Liping xiang, Cheng Luo, Kaijun Deng, Xiaowen Fu, Linlin Shen, Jinbao Wang
 
-\| Webpage(TBA) \| Full Paper(TBA) \| Video(TBA) \|
+\| [Full Paper](https://arxiv.org/pdf/2508.19699) \| PRCV 2025 \|
+
+
+<img width="600" alt="top5" src="https://github.com/user-attachments/assets/e9ccb684-d8db-401d-866c-32d4ec642f8e" />
+
+Abstract: 3D Gaussian Splatting (3DGS) has emerged as a novel explicit representation for 3D scenes, offering both high-fidelity reconstruction and efficient rendering. However, 3DGS lacks 3D segmentation ability, which limits its applicability in tasks that require scene understanding. The identification and isolation of specific object components is crucial. To address this limitation, we propose Label-aware 3D Gaussian Splatting (LabelGS), a method that augments the Gaussian representation with object label.
+LabelGS introduces cross-view consistent semantic masks for 3D Gaussians and employs a novel Occlusion Analysis Model to avoid overfitting occlusion during optimization, Main Gaussian Labeling model to lift 2D semantic prior to 3D Gaussian and Gaussian Projection Filter to avoid Gaussian label conflict. 
+Our approach achieves effective decoupling of Gaussian representations and refines the 3DGS optimization process through a random region sampling strategy, significantly improving efficiency. Extensive experiments demonstrate that LabelGS outperforms previous state-of-the-art methods, including Feature-3DGS, in the 3D scene segmentation task. Notably, LabelGS achieves a remarkable 22 $\times$ speedup in training compared to Feature-3DGS, at a resolution of $1440\times1080$.
 
 ----
 
@@ -79,12 +86,11 @@ https://github.com/user-attachments/assets/ebd8f2d8-0f27-49ee-a67c-c11bfb454479
 
 Segmentint multiple objects simultaneously.
 
-https://github.com/user-attachments/assets/b5ff5558-f3a1-4ae2-b8d7-4c611372f3a9
+https://github.com/user-attachments/assets/f557a4cf-7b4f-4254-9f21-ec0119161a7b
 
 Segmenting the occluded object and showing the occluded region.
 
-https://github.com/user-attachments/assets/f557a4cf-7b4f-4254-9f21-ec0119161a7b
-
+https://github.com/user-attachments/assets/b5ff5558-f3a1-4ae2-b8d7-4c611372f3a9
 
 
 ## 5. Evaluation
@@ -95,4 +101,16 @@ https://github.com/user-attachments/assets/f557a4cf-7b4f-4254-9f21-ec0119161a7b
   python eval/eval_all.py --dataset_name 3d_ovs
   ```
 
----
+## BibTeX
+
+```
+@inproceedings{zhang2025labelgs,
+    title={LabelGS: Label-Aware 3D Gaussian Splatting for 3D Scene Segmentation},
+    author={Yupeng Zhang, Dezhi Zheng, Ping Lu, Han Zhang, Lei Wang, Liping xiang, Cheng Luo, Kaijun Deng, Xiaowen Fu, Linlin Shen, Jinbao Wang},
+    journal={arXiv preprint arXiv:2508.19699},
+    year={2025}
+}
+```
+
+
+
