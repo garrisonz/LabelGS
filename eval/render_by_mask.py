@@ -55,7 +55,8 @@ def render_process(dataset : ModelParams, pipeline : PipelineParams, args):
     print(scene_name)
     dataset_name = args.model_path.split("/")[-2]
     print(dataset_name)
-    seg_path = f"/home/zhangyupeng/w/3drecon/LabelGS/dataset/{dataset_name}/{scene_name}/mask_prompt"
+    project_path = os.getcwd()
+    seg_path = f"{project_path}/dataset/{dataset_name}/{scene_name}/mask_prompt"
 
     prompt, eval_set = get_prompt_and_eval(seg_path)
     prompt_frame = list(prompt.keys())[0]

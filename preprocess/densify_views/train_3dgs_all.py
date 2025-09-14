@@ -10,7 +10,8 @@ dataset_name = args.dataset_name
 eval = args.eval
 scene = args.scene
 
-dataset_path = f"/home/zhangyupeng/w/3drecon/LabelGS/dataset/{dataset_name}"
+project_path = os.getcwd()
+dataset_path = f"{project_path}/dataset/{dataset_name}"
 print(dataset_path)
 
 # get folder in dataset_path dir

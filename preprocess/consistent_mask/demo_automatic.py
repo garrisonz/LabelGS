@@ -8,7 +8,7 @@ import numpy as np
 
 # set deva path as /home/zhangyupeng/deva
 import sys
-sys.path.append("/home/zhangyupeng/w/3drecon/Tracking-Anything-with-DEVA")
+sys.path.append(f"{os.getcwd()}/Tracking-Anything-with-DEVA")
 
 from deva.inference.inference_core import DEVAInferenceCore
 from deva.inference.data.simple_video_reader import SimpleVideoReader, no_collate

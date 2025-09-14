@@ -9,7 +9,7 @@ args = parser.parse_args()
 dataset_name = args.dataset_name
 scene = args.scene
 
-project_path = "/home/zhangyupeng/w/3drecon/LabelGS"
+project_path = os.getcwd()
 dataset_path = f"{project_path}/dataset/{dataset_name}"
 print(dataset_path)
 

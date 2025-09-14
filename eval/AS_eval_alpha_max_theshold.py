@@ -5,7 +5,8 @@ parser.add_argument("--dataset_name", type=str, required=True) # example 3d_ovs
 args = parser.parse_args()
 dataset_name = args.dataset_name
 
-dataset_path = f"/home/zhangyupeng/w/3drecon/LabelGS/dataset/{dataset_name}"
+project_path = os.getcwd()
+dataset_path = f"{project_path}/dataset/{dataset_name}"
 print(dataset_path)
 
 loaded_iter = 15000

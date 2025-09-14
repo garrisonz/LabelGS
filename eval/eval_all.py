@@ -13,7 +13,8 @@ white_background = args.white_background
 scene = args.scene
 exclude = args.exclude_scenes.split(",") 
 
-dataset_path = f"/home/zhangyupeng/w/3drecon/LabelGS/dataset/{dataset_name}"
+project_path = os.getcwd()
+dataset_path = f"{project_path}/dataset/{dataset_name}"
 print(dataset_path)
 
 # get folder in dataset_path dir

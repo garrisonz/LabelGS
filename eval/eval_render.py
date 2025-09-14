@@ -23,7 +23,8 @@ def render_by_mask_prompt(dataset : ModelParams, pipeline : PipelineParams, args
     dataset_name = args.dataset_name
     print(dataset_name)
 
-    seg_path = f"/home/zhangyupeng/w/3drecon/LabelGS/dataset/{dataset_name}/{scene_name}/segmentations"
+    project_path = os.getcwd()
+    seg_path = f"{project_path}/dataset/{dataset_name}/{scene_name}/segmentations"
 
 
     from utils.eval_tools import get_prompt_and_eval
