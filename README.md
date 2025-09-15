@@ -103,18 +103,33 @@ Next, download required foundation models (for depth estimation, segmentation, e
   python g_train_all.py --dataset_name 3d_ovs --scene room --config_file config/w1_v5.yaml
   ```
 
-## 5. GUI
+## 5. GUI Visualization
+Use the interactive GUI to visualize 3D scene segmentation results (supports single/multi-object segmentation and occlusion region inspection). The GUI provides intuitive controls for view adjustment, segmentation operation, and rendering parameter tuning.
 
- Use the interactive GUI to visualize 3D scene segmentation results (supports single/multi-object segmentation and occlusion region inspection):
- 
-  ```
-  python labelgs_gui.py -m {model_output_path} -s {scene_path}
+### 5.1 Basic Command
+```bash
+# General command
+# -m: Path to the trained model output (e.g., output/3d_ovs/w1_room_v5)
+# -s: Path to the scene data (e.g., dataset/3d_ovs/room)
+python labelgs_gui.py -m {model_output_path} -s {scene_path}
 
-  # Example (replace placeholders with actual paths)
-  python labelgs_gui.py -m output/3d_ovs/w1_room_v5 -s dataset/3d_ovs/room
-  ```
+# Example (replace placeholders with actual paths)
+python labelgs_gui.py -m output/3d_ovs/w1_room_v5 -s dataset/3d_ovs/room
+```
 
-### Demo Videos
+### 5.2 Detailed Usage Instructions
+| Operation/Control       | Function Description                                                                 |
+|--------------------------|---------------------------------------------------------------------------------------|
+| **Mouse Left Drag**      | Hold and drag the left mouse button to rotate/translate the 3D scene view (adjust perspective freely). |
+| **Mouse Right + Segment3D Button** | First click the `segment3d` button in the GUI, then hold the right mouse button to select target objects. Multiple objects can be selected in one operation for simultaneous segmentation. |
+| **Clear Button**         | Click to cancel all existing segmentation results and reset the selection state.     |
+| **Playing Toggle**       | Check the `playing` option to enable automatic playback of rendering effects across different pre-defined perspectives (no manual view adjustment needed). |
+| **Reset_Playing Button** | Click to stop the automatic playback and reset the view to the initial perspective.  |
+| **Scale Slider**         | Drag the `Scale` slider to adjust the radius of 3D Gaussians (affects the visual granularity of the 3D scene). |
+| **Training FOVy Slider** | Drag the `training fovy` slider to modify the vertical field of view (FOVy) of the virtual camera, adjusting the visible range of the 3D scene. |
+
+
+### 5.3 Demo Videos
   Segmenting one object.
   
   https://github.com/user-attachments/assets/ebd8f2d8-0f27-49ee-a67c-c11bfb454479
@@ -147,6 +162,7 @@ Next, download required foundation models (for depth estimation, segmentation, e
     year={2025}
 }
 ```
+
 
 
 
