@@ -265,9 +265,11 @@ class GaussianModel:
         for idx, attr_name in enumerate(rot_names):
             rots[:, idx] = np.asarray(plydata.elements[0][attr_name])
 
-        if "label" in plydata.elements[0].properties:
+        if "label" in [p.name for p in plydata.elements[0].properties]:
             label = np.asarray(plydata.elements[0]["label"])
+            print("label in ply file! max:", label.max(), "min:", label.min())
         else:
+            print("no label in ply file!")
             label = np.zeros((xyz.shape[0]), dtype=np.int32)
 
         # label = np.asarray(plydata.elements[0]["label"])

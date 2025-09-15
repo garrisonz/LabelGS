@@ -80,7 +80,7 @@ class GaussianSplattingGUI:
         os.makedirs(self.save_folder, exist_ok=True)
 
         from segment_anything import SamPredictor, sam_model_registry
-        sam_checkpoint = "ckpts/sam/sam_vit_h_4b8939.pth"
+        sam_checkpoint = "saves/sam_vit_h_4b8939.pth"
         model_type = "vit_h"
         device = "cuda"
 
@@ -213,6 +213,7 @@ class GaussianSplattingGUI:
                 self.click_time = now.strftime("%d_%H%M%S")
                 self.click_multiview_num = 0
                 os.makedirs(f"{self.save_folder}/{self.click_time}", exist_ok=True)
+                print("new click:", self.new_click_xy, "app_data:", app_data, "dirs:", f"{self.save_folder}/{self.click_time}")
 
 
         with dpg.handler_registry():
@@ -322,6 +323,11 @@ class GaussianSplattingGUI:
                 alpha_id_map = alpha_id_map.type(torch.long)
 
                 label_map = gaussians.label[alpha_id_map].cpu().numpy()
+                print("label_map max:", label_map.max(), "min:", label_map.min())
+                # save label_map as png
+                save_path = f"{self.save_folder}/{self.click_time}/label_map.png"
+                save_image(label_map, save_path)
+
                 label_map_cnt = np.unique(label_map, return_counts=True)
 
                 label_map_cnt = dict(zip(label_map_cnt[0], label_map_cnt[1]))
@@ -335,7 +341,7 @@ class GaussianSplattingGUI:
                         self.label_list.append(k)
                 self.label_list = list(set(self.label_list))
 
-                print(self.label_list)
+                print("self.label_list:", self.label_list)
 
             if len(self.label_list) > 0:
                 labels = torch.tensor(self.label_list, device="cuda")
@@ -430,14 +436,16 @@ class GaussianSplattingGUI:
         return torch.tensor(masks[np.argmax(scores)], device="cuda")
 
 def save_image(img, path):
-    img = img.cpu().numpy()
+    if hasattr(img, 'cpu'):  # 如果是 PyTorch 张量
+        img = img.cpu().numpy()
+    # 如果已经是 numpy 数组，直接使用
     img = (img * 255).astype(np.uint8)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     cv2.imwrite(path, img)
 
 def get_camera_pose(scene_path, image_height, image_width):
 
-    if os.path.exists(os.path.join(scene_path, "sparse/0", "images.bin")) and os.path.exists(os.path.join(path, "sparse/0", "cameras.bin")):
+    if os.path.exists(os.path.join(scene_path, "sparse/0", "images.bin")) and os.path.exists(os.path.join(scene_path, "sparse/0", "cameras.bin")):
         cameras_extrinsic_file = os.path.join(scene_path, "sparse/0", "images.bin")
         cameras_intrinsic_file = os.path.join(scene_path, "sparse/0", "cameras.bin")
         cam_extrinsics = read_extrinsics_binary(cameras_extrinsic_file)

@@ -140,13 +140,15 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
             # #start save
             save_debug_interval = 1000
+            # os.makedirs(train_path, exist_ok=True)
             # if iteration % save_debug_interval == 0:
             #     save_image = image.clone().type(torch.float32)
             #     torchvision.utils.save_image(save_image,  train_path+f"/{iteration}_{image_name}_image.png")
             #     label_map = gaussians.label[alpha_id_map.type(torch.long)]
             #     save_label_map = label_map.clone().type(torch.float32) / label_map.max()
             #     torchvision.utils.save_image(save_label_map,  train_path+f"/{iteration}_{image_name}_label_map_before.png")
-            # # end save
+            #     print("save path:", train_path+f"/{iteration}_{image_name}_label_map_before.png")
+            # end save
 
             sample_mask_ids = mask_ids[torch.randperm(mask_ids.shape[0])][:args.mask_sample_number]
 
@@ -358,11 +360,11 @@ if __name__ == "__main__":
     parser.add_argument('--debug_from', type=int, default=-1)
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
     #parser.add_argument("--test_iterations", nargs="+", type=int, default=[7_000, 30_000])
-    parser.add_argument("--save_iterations", nargs="+", type=int, default=[5000, 7_000, 10000, 15000, 20000, 30_000, 40000, 50000, 60000])
+    parser.add_argument("--save_iterations", nargs="+", type=int, default=[2000, 5000, 7_000, 10000, 15000, 20000, 30_000, 40000, 50000, 60000])
     parser.add_argument("--test_iterations", nargs="+", type=int, default=None)
     parser.add_argument("--save_image_iterations", nargs="+", type=int, default=None)
     parser.add_argument("--quiet", action="store_true")
-    parser.add_argument("--checkpoint_iterations", nargs="+", type=int, default=[5000, 7000, 10000, 15000, 20000, 30000, 40000, 50000, 60000])
+    parser.add_argument("--checkpoint_iterations", nargs="+", type=int, default=[2000, 5000, 7000, 10000, 15000, 20000, 30000, 40000, 50000, 60000])
     parser.add_argument("--start_checkpoint", type=str, default=None)
     parser.add_argument("--label", action="store_true", default=False)
     parser.add_argument("--occlude_flag", action="store_true", default=False)
