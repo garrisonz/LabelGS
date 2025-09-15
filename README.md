@@ -17,67 +17,84 @@ Our approach achieves effective decoupling of Gaussian representations and refin
 
 - We provide `segmentations` folder for nerf_llff_data dataset and 3d_ovs dataset, to evaluate the performance of 3D Object segmentation by extracting 3D representation primitive
 
+dataset struction
+  ```
+  dataset/
+  |--3d_ovs
+    |--sofa
+      |--images
+      |--segmentations
+    |--room
+      |--images
+      |--segmentations
+  ...
+  ```
+
+
+## 2. Installation
+Dowload codes and install libaries
+  ```bash
+    git clone https://github.com/garrisonz/LabelGS.git --recursive
+    cd LabelGS
+    
+    conda create -n labelgs python=3.8
+    conda activate labelgs
+    
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+    pip install plyfile==1.0.3
+    pip install tqdm scipy wandb opencv-python scikit-learn lpips imageio scikit-image matplotlib 
+    pip install pulp pycocotools segment_anything timm
+    pip install dearpygui # 可视化库
+    
+    
+    pip install submodules/labelgs-rasterization/
+    pip install submodules/simple-knn
+  ```
+
+Download fundation models
+
+  ```bash
+  mkdir -p checkpoints
+  # download for Depth_anything 
+  wget -P checkpoints/ https://huggingface.co/depth-anything/Depth-Anything-V2-Large/resolve/main/depth_anything_v2_vitl.pth
+  
+  # download for DEVA 
+  wget -P ./saves/ https://github.com/hkchengrex/Tracking-Anything-with-DEVA/releases/download/v1.0/DEVA-propagation.pth
+  wget -P ./saves/ https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
+  
+  ```
+
+
 ## 2. Data Preprocess
 
-### 2.1 Densify Views
-
-- native 3DGS reconstruction
+  ```bashS
+  # obtain depth maps
+  python preprocess/unocclusion_mask/depth_estimation.py --dataset_path dataset/3d_ovs --scene room
   
-  ```jsx
-  python preprocess/densify_views/train_3dgs_all.py --dataset_name 3d_ovs
-  ```
-
-- render dense views as video frames from 3DGS model
+  # obtain multi-view masks
+  python preprocess/consistent_mask/demo_automatic_all.py --dataset_name 3d_ovs --scene room
+  python preprocess/consistent_mask/uni_mask.py --dataset_path dataset/3d_ovs --scene room
   
-  ```jsx
-  python preprocess/densify_views/render_video_all.py --dataset_name 3d_ovs
-  ```
-
-### 2.2 Cross-View Consistent Mask
-
-- Build a python environment according [DEVA](https://github.com/hkchengrex/Tracking-Anything-with-DEVA)
-
-- generate cross-view consistent masks from DEVA in DEVA env
+  # calculate occlusion relationship
+  python -m preprocess.unocclusion_mask.get_occlude_mapping --dataset_path dataset/3d_ovs --scene room
   
-  ```jsx
-  (deva) python preprocess/consistent_mask/demo_automatic_all.py --dataset_name 3d_ovs
-  ```
-
-- Mapping RGB mask to gray mask
-  
-  ```jsx
-  python preprocess/consistent_mask/uni_mask_all.py --dataset_name 3d_ovs 
-  ```
-
-### 2.3 Unocclusion Mask
-
-- Build a python env for [DepthAnythingV2](https://github.com/DepthAnything/Depth-Anything-V2)
-
-- Generate depth map in DepthAnythingV2 env
-  
-  ```jsx
-  (depth_anything_v2) python preprocess/unocclusion_mask/run_all.py --dataset_name 3d_ovs
-  ```
-
-- Obtain occlusion relationship
-  
-  ```jsx
-  python preprocess/unocclusion_mask/get_occlude_mapping_all.py --dataset_name 3d_ovs
+  # estimate camera poses by colmap
+  python preprocess/colmap_tool/run_colmap.py --base_dir dataset/3d_ovs/room
   ```
 
 ## 3. Training
-
-- Label-Aware 3D Gaussian Splatting
   
-  ```jsx
-  Python train_all.py  --dataset_name 3d_ovs
+  Label-Aware 3D Gaussian Splatting
+  
+  ```bash
+  python g_train_all.py --dataset_name 3d_ovs --scene room --config_file config/w1_v5.yaml
   ```
 
 ## 4. GUI
   ```
   python labelgs_gui.py -m {model_output_path} -s {scene_path}
   ```
-  For example, `python labelgs_gui.py -m output/3d_ovs/auto_bed_segEval3 -s dataset/3d_ovs/bed`
+  For example, `python labelgs_gui.py -m output/3d_ovs/w1_room_v5 -s dataset/3d_ovs/room`
 
 
 Segmenting one object.
@@ -95,10 +112,10 @@ https://github.com/user-attachments/assets/b5ff5558-f3a1-4ae2-b8d7-4c611372f3a9
 
 ## 5. Evaluation
 
-- Evaluation for PSNR and mIoU
+Evaluation for PSNR and mIoU
   
-  ```jsx
-  python eval/eval_all.py --dataset_name 3d_ovs
+  ```bash
+  python eval/g_eval_render_all.py --dataset_name 3d_ovs --scene room --config_file config/w1_v5.yaml
   ```
 
 ## BibTeX
@@ -111,6 +128,7 @@ https://github.com/user-attachments/assets/b5ff5558-f3a1-4ae2-b8d7-4c611372f3a9
     year={2025}
 }
 ```
+
 
 
 
