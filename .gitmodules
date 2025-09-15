@@ -4,3 +4,9 @@
 [submodule "submodules/simple-knn"]
 	path = submodules/simple-knn
 	url = https://gitlab.inria.fr/bkerbl/simple-knn
+[submodule "submodules/depth_anything_v2"]
+	path = submodules/depth_anything_v2
+	url = https://github.com/DepthAnything/Depth-Anything-V2.git
+[submodule "submodules/Tracking-Anything-with-DEVA"]
+	path = submodules/Tracking-Anything-with-DEVA
+	url = https://github.com/hkchengrex/Tracking-Anything-with-DEVA.git

@@ -34,6 +34,6 @@ for scene_name in scene_names:
     cmd = (f"python preprocess/consistent_mask/demo_automatic.py "
           f"--chunk_size 4 --img_path {img_path} "
           f"--amp --temporal_setting semionline --size 480 --output {mask_root} "
-          f"--suppress_small_objects --SAM_PRED_IOU_THRESHOLD 0.7")
+          f"--suppress_small_objects --SAM_PRED_IOU_THRESHOLD 0.7 --SAM_NUM_POINTS_PER_SIDE 24")
     print(cmd)
     os.system(cmd) 

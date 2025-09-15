@@ -217,31 +217,21 @@ def readColmapSceneInfo(path, images, eval, version, mask_version, occlude_flag,
     cam_infos = sorted(cam_infos_unsorted.copy(), key = lambda x : x.image_name)
 
     if eval:
-        if version.startswith("5.1"):
-            print("Using version 5 evaluation")
-            img_list_path = os.path.join(path, "test_images.txt")
-            with open(img_list_path, 'r') as f:
-                img_list = f.readlines()
-                img_list = [img.strip().split(".")[0] for img in img_list]
-            test_cam_infos = [c for c in cam_infos if c.image_name in img_list]
-            train_cam_infos = [c for c in cam_infos if c.image_name not in img_list]
-        else:
-            print("Using non-5 version evaluation")
-            seg_path = os.path.join(path, "segmentations")
+        seg_path = os.path.join(path, "segmentations")
 
-            if os.path.exists(seg_path):
-                seg_list = get_seg_image_list(path)
-                seg_list = seg_list[1:]
-                test_cam_infos = []
-                train_cam_infos = []
-                for cam in cam_infos:
-                    if cam.image_name in seg_list:
-                        test_cam_infos.append(cam)
-                    else:
-                        train_cam_infos.append(cam)
-            else:
-                train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
-                test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+        if os.path.exists(seg_path):
+            seg_list = get_seg_image_list(path)
+            seg_list = seg_list[1:]
+            test_cam_infos = []
+            train_cam_infos = []
+            for cam in cam_infos:
+                if cam.image_name in seg_list:
+                    test_cam_infos.append(cam)
+                else:
+                    train_cam_infos.append(cam)
+        else:
+            train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
+            test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
     else:
         train_cam_infos = cam_infos
         test_cam_infos = []

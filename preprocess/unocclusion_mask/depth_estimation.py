@@ -8,7 +8,7 @@ import os
 import torch
 
 import sys
-sys.path.append(f"{os.getcwd()}/Depth-Anything-V2")
+sys.path.append(f"{os.getcwd()}/submodules/depth_anything_v2")
 
 from depth_anything_v2.dpt import DepthAnythingV2
 

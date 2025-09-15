@@ -6,9 +6,8 @@ import torch
 from torch.utils.data import DataLoader
 import numpy as np
 
-# set deva path as /home/zhangyupeng/deva
 import sys
-sys.path.append(f"{os.getcwd()}/Tracking-Anything-with-DEVA")
+sys.path.append(f"{os.getcwd()}/submodules/Tracking-Anything-with-DEVA")
 
 from deva.inference.inference_core import DEVAInferenceCore
 from deva.inference.data.simple_video_reader import SimpleVideoReader, no_collate
@@ -60,10 +59,11 @@ if __name__ == '__main__':
 
     deva = DEVAInferenceCore(deva_model, config=cfg)
     deva.next_voting_frame = args.num_voting_frames - 1
-    if args.use_short_id:
-        pass
-    else:
-        deva.enabled_long_id()
+    #if args.use_short_id:
+    #    pass
+    #else:
+    #    deva.enabled_long_id()
+    deva.enabled_long_id()
     result_saver = ResultSaver(out_path, None, dataset='demo', object_manager=deva.object_manager)
 
     with torch.cuda.amp.autocast(enabled=args.amp):
