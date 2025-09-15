@@ -1,9 +1,0 @@
-# w0_v3.2.yaml
-iteration: 15000
-work: 0
-version: 3.2
-mask_version: 2
-gpf_flag: True
-eval_flag: True
-occlude_flag: True
-mask_sample_number: 10

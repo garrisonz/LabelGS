@@ -149,6 +149,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset_path", type=str, required=True) # f"dataset/{dataset_name}"
     parser.add_argument("--scene", type=str, default=None) # example 3d_ovs
+    parser.add_argument("--work", type=str, default="1")
     args = parser.parse_args()
     dataset_path = args.dataset_path
     scene = args.scene
@@ -168,5 +169,5 @@ if __name__ == "__main__":
     for scene_name in scene_names:
         
         scene_path = f"dataset/{dataset_name}/{scene_name}"
-        out_dir = f"output/{dataset_name}/w2_{scene_name}_v{version}"
+        out_dir = f"output/{dataset_name}/w{work}_{scene_name}_v{version}"
         get_occlude_mapping(scene_path, out_dir, mask_version)

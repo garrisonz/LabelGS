@@ -1,9 +1,9 @@
-# w1_v4.yaml
+
 iteration: 15000
 work: 1
-version: 4
+version: 5
 mask_version: 2
-gpf_flag: False
+gpf_flag: True
 eval_flag: True
-occlude_flag: False
+occlude_flag: True
 mask_sample_number: 10

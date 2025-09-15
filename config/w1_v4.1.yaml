@@ -1,9 +1,0 @@
-# w1_v4.1.yaml
-iteration: 15000
-work: 1
-version: 4.1
-mask_version: 2
-gpf_flag: True
-eval_flag: True
-occlude_flag: False
-mask_sample_number: 10

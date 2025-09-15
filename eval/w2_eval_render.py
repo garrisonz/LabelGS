@@ -117,6 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("--scene_name", type=str, required=True) # example 3d_ovs
     parser.add_argument("--mask_version", type=int, required=True)
     parser.add_argument("--version", type=str, required=True)
+    parser.add_argument("--work", type=str, default="1")
 
     args = get_combined_args(parser)
     print("Rendering " + args.model_path)
@@ -133,7 +134,7 @@ if __name__ == "__main__":
     version = args.version
     iteration = args.loaded_iter
 
-    save_path = f"result/{dataset_name}/w2_{scene_name}_v{version}/render{iteration}"
+    save_path = f"result/{dataset_name}/w{work}_{scene_name}_v{version}/render{iteration}"
     makedirs(save_path, exist_ok=True)
     os.makedirs(save_path, exist_ok=True)
 
