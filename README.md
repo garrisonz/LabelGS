@@ -15,24 +15,31 @@ Our approach achieves effective decoupling of Gaussian representations and refin
 
 ## 1. Dataset
 
-- We provide `segmentations` folder for nerf_llff_data dataset and 3d_ovs dataset, to evaluate the performance of 3D Object segmentation by extracting 3D representation primitive
+We provide `segmentations` folder for nerf_llff_data dataset and 3d_ovs dataset, to evaluate the performance of 3D Object segmentation by extracting 3D representation primitive.
 
-dataset struction
+This is a example of one dataset struction .
   ```
   dataset/
-  |--3d_ovs
-    |--sofa
-      |--images
-      |--segmentations
-    |--room
-      |--images
-      |--segmentations
-  ...
+  │
+  ├─ 3d_ovs/
+  │   │
+  │   ├─ sofa/
+  │   │   ├─ images/
+  │   │   └─ segmentations/
+  │   │
+  │   ├─ room/
+  │   │   ├─ images/
+  │   │   └─ segmentations/
+  │   │
+  │   └─ ...
+  │
+  └─ 360_v2/
+      └─...
   ```
 
 
 ## 2. Installation
-Dowload codes and install libaries
+Dowload codes and install libaries.
   ```bash
   git clone https://github.com/garrisonz/LabelGS.git --recursive
   cd LabelGS
@@ -51,7 +58,7 @@ Dowload codes and install libaries
   pip install submodules/simple-knn
   ```
 
-Download fundation models
+Download fundation models.
 
   ```bash
   mkdir -p checkpoints
@@ -65,7 +72,7 @@ Download fundation models
   ```
 
 
-## 2. Data Preprocess
+## 3. Data Preprocess
 
   ```bashS
   # obtain depth maps
@@ -82,19 +89,19 @@ Download fundation models
   python preprocess/colmap_tool/run_colmap.py --base_dir dataset/3d_ovs/room
   ```
 
-## 3. Training
+## 4. Training
   
-  Label-Aware 3D Gaussian Splatting
+  Label-Aware 3D Gaussian Splatting.
   
   ```bash
   python g_train_all.py --dataset_name 3d_ovs --scene room --config_file config/w1_v5.yaml
   ```
 
-## 4. GUI
+## 5. GUI
   ```
   python labelgs_gui.py -m {model_output_path} -s {scene_path}
   ```
-  For example, `python labelgs_gui.py -m output/3d_ovs/w1_room_v5 -s dataset/3d_ovs/room`
+  For example, `python labelgs_gui.py -m output/3d_ovs/w1_room_v5 -s dataset/3d_ovs/room`.
 
 
 Segmenting one object.
@@ -110,9 +117,9 @@ Segmenting the occluded object and showing the occluded region.
 https://github.com/user-attachments/assets/b5ff5558-f3a1-4ae2-b8d7-4c611372f3a9
 
 
-## 5. Evaluation
+## 6. Evaluation
 
-Evaluation for PSNR and mIoU
+Evaluation for PSNR and mIoU.
   
   ```bash
   python eval/g_eval_render_all.py --dataset_name 3d_ovs --scene room --config_file config/w1_v5.yaml
@@ -128,6 +135,7 @@ Evaluation for PSNR and mIoU
     year={2025}
 }
 ```
+
 
 
 
