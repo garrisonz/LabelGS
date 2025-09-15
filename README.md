@@ -34,21 +34,21 @@ dataset struction
 ## 2. Installation
 Dowload codes and install libaries
   ```bash
-    git clone https://github.com/garrisonz/LabelGS.git --recursive
-    cd LabelGS
-    
-    conda create -n labelgs python=3.8
-    conda activate labelgs
-    
-    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-    pip install plyfile==1.0.3
-    pip install tqdm scipy wandb opencv-python scikit-learn lpips imageio scikit-image matplotlib 
-    pip install pulp pycocotools segment_anything timm
-    pip install dearpygui # 可视化库
-    
-    
-    pip install submodules/labelgs-rasterization/
-    pip install submodules/simple-knn
+  git clone https://github.com/garrisonz/LabelGS.git --recursive
+  cd LabelGS
+  
+  conda create -n labelgs python=3.8
+  conda activate labelgs
+  
+  pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+  pip install plyfile==1.0.3
+  pip install tqdm scipy wandb opencv-python scikit-learn lpips imageio scikit-image matplotlib 
+  pip install pulp pycocotools segment_anything timm
+  pip install dearpygui # visualization
+  
+  
+  pip install submodules/labelgs-rasterization/
+  pip install submodules/simple-knn
   ```
 
 Download fundation models
@@ -128,6 +128,7 @@ Evaluation for PSNR and mIoU
     year={2025}
 }
 ```
+
 
 
 
