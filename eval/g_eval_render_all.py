@@ -7,12 +7,13 @@ parser.add_argument("--dataset_name", type=str, required=True) # example 3d_ovs
 parser.add_argument("--scene", type=str, default=None)
 parser.add_argument("--config_file", type=str, required=True)
 parser.add_argument("--white_background", action="store_true", default=False)
-parser.add_argument("--exclude_scenes", type=str, default="", help="support multi scene, e.g. room,sofa") # example 3d_ovs
+parser.add_argument("--exclude_scenes", type=str, default="", help="support multi scene, e.g. room,sofa")
+
 args = parser.parse_args()
 dataset_name = args.dataset_name
 white_background = args.white_background
 scene = args.scene
-exclude = args.exclude_scenes.split(",") 
+exclude = args.exclude_scenes.split(",")
 
 project_path = os.getcwd()
 dataset_path = f"{project_path}/dataset/{dataset_name}"
@@ -39,6 +40,7 @@ with open(args.config_file, 'r') as f:
     gpf_flag =  "--gpf_flag" if config['gpf_flag'] else ""
     mask_sample_number = config['mask_sample_number']
     work = config['work']
+    loaded_iter = config['iteration']
 
 if white_background:
     white_background = "--white_background"
@@ -46,10 +48,6 @@ else:
     white_background = ""
 
 for scene_name in scene_names:
-
-    loaded_iter = 15000
-    if scene_name == "garden":
-        loaded_iter = 10000
 
     cmd = (f"python -m eval.eval_render -m output/{dataset_name}/w{work}_{scene_name}_v{version} "
            f"--loaded_iter {loaded_iter} {white_background} "

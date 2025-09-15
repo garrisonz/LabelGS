@@ -133,6 +133,7 @@ if __name__ == "__main__":
     scene_name = args.scene_name
     version = args.version
     iteration = args.loaded_iter
+    work = args.work
 
     save_path = f"result/{dataset_name}/w{work}_{scene_name}_v{version}/render{iteration}"
     makedirs(save_path, exist_ok=True)

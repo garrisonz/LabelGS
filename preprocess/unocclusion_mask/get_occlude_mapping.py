@@ -153,6 +153,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     dataset_path = args.dataset_path
     scene = args.scene
+    work = args.work
 
     dataset_name = dataset_path.split("/")[-1]
     print("dataset_name", dataset_name)
