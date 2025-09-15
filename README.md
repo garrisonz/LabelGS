@@ -108,9 +108,7 @@ Use the interactive GUI to visualize 3D scene segmentation results (supports sin
 
 ### 5.1 Basic Command
 ```bash
-# General command
-# -m: Path to the trained model output (e.g., output/3d_ovs/w1_room_v5)
-# -s: Path to the scene data (e.g., dataset/3d_ovs/room)
+# General comman
 python labelgs_gui.py -m {model_output_path} -s {scene_path}
 
 # Example (replace placeholders with actual paths)
@@ -162,6 +160,7 @@ python labelgs_gui.py -m output/3d_ovs/w1_room_v5 -s dataset/3d_ovs/room
     year={2025}
 }
 ```
+
 
 
 
