@@ -53,7 +53,7 @@ Our approach achieves effective decoupling of Gaussian representations and refin
   pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
   pip install plyfile==1.0.3
   pip install tqdm scipy wandb opencv-python scikit-learn lpips imageio scikit-image matplotlib 
-  pip install pulp pycocotools segment_anything timm
+  pip install pulp pycocotools segment_anything timm supervision
   pip install dearpygui # visualization
   
   
@@ -159,6 +159,7 @@ python labelgs_gui.py -m output/3d_ovs/w1_room_v5 -s dataset/3d_ovs/room
     year={2025}
 }
 ```
+
 
 
 
