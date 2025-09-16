@@ -17,7 +17,7 @@ Our approach achieves effective decoupling of Gaussian representations and refin
 
 ## 1. Dataset
 
-We provide `segmentations` folder for nerf_llff_data dataset and 3d_ovs dataset, to evaluate the performance of 3D Object segmentation by extracting 3D representation primitive.
+We provide 4 verifiable [datasets](https://huggingface.co/datasets/zhangyupeng90/labelgs_datasets/tree/main) (3d_ovs, nerf_llff_data, lerf_mask, 360_v2) for evaluation. Each dataset contains two folders: images and segmentations.
 
 This is an example of the dataset structure.
   ```
@@ -26,8 +26,8 @@ This is an example of the dataset structure.
   ├─ 3d_ovs/
   │   │
   │   ├─ sofa/
-  │   │   ├─ images/
-  │   │   └─ segmentations/
+  │   │   ├─ images/  # Raw RGB scene images (for 3D Gaussian reconstruction)
+  │   │   └─ segmentations/ #2D semantic masks (for 3D object segmentation evaluation)
   │   │
   │   ├─ room/
   │   │   ├─ images/
@@ -160,6 +160,7 @@ python labelgs_gui.py -m output/3d_ovs/w1_room_v5 -s dataset/3d_ovs/room
     year={2025}
 }
 ```
+
 
 
 
